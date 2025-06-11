@@ -41,9 +41,16 @@ logger = logging.getLogger(__name__)
 # all get methods
 class CustomUserListView(APIView):
     def get(self, request):
-        users = User.objects.raw(GET_NON_ADMIN_USERS)
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            users = User.objects.raw(GET_NON_ADMIN_USERS)
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error fetching users: {str(e)}")
+            return Response(
+                {"error": "Failed to fetch users", "err_message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 # all post methods
