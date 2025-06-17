@@ -3,6 +3,7 @@ Django settings for core project.
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -70,11 +71,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'karthik_DB',  # Your RDS DB name
-        'USER': 'postgres',    # Your RDS username
-        'PASSWORD': 'DyoRskMlHVf6seBFV1KG',  # Replace with your actual password
-        'HOST': 'database-1.cleoq8mgw0ey.ap-south-1.rds.amazonaws.com',  # RDS endpoint
-        'PORT': '5432',
+        'NAME': os.environ.get("POSTGRES_DB"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        'HOST': os.environ.get("POSTGRES_HOST"),
+        'PORT': os.environ.get("POSTGRES_PORT", 5432),
         'OPTIONS': {
             'sslmode': 'require',
         }
