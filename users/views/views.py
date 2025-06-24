@@ -28,7 +28,7 @@ from django.db import  DatabaseError, IntegrityError
 from .sql_quereis.get_queries import GET_NON_ADMIN_USERS
 
 # model imports
-from users.models import User
+from users.models import UserModel
 from .helper.utils import validate_input, insert_user_into_db, build_success_response
 
 # logging
@@ -42,9 +42,15 @@ logger = logging.getLogger(__name__)
 class CustomUserListView(APIView):
     def get(self, request):
         try:
-            users = User.objects.raw(GET_NON_ADMIN_USERS)
+            users = UserModel.objects.raw(GET_NON_ADMIN_USERS)
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        except DatabaseError as e:
+            logger.error(f"DatabaseError while fetching users: {str(e)}")
+            return Response(
+                {"error": "Database error occurred while fetching users", "err_message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         except Exception as e:
             logger.error(f"Error fetching users: {str(e)}")
             return Response(
@@ -55,7 +61,7 @@ class CustomUserListView(APIView):
 
 # all post methods
 class UserListCreateView(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = UserModel.objects.all()
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
