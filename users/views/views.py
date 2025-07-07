@@ -41,10 +41,22 @@ logger = logging.getLogger(__name__)
 # all get methods
 class CustomUserListView(APIView):
     def get(self, request):
+        user_id = request.query_params.get('id')
         try:
-            users = UserModel.objects.raw(GET_NON_ADMIN_USERS)
-            serializer = UserSerializer(users, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if user_id:
+                user = UserModel.objects.get(id=user_id)
+                serializer = UserSerializer(user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                # users = UserModel.objects.raw(GET_NON_ADMIN_USERS)
+                users = UserModel.objects.all().order_by('-created_at')
+                serializer = UserSerializer(users, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except UserModel.DoesNotExist:
+            return Response(
+                {"error": "User not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         except DatabaseError as e:
             logger.error(f"DatabaseError while fetching users: {str(e)}")
             return Response(
