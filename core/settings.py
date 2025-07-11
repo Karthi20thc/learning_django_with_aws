@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'corsheaders',  # CORS headers
 
     'users',  # Your app name
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -148,3 +149,14 @@ REST_FRAMEWORK = {
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+
+ASGI_APPLICATION = "core.asgi.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}
